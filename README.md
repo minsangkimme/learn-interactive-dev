@@ -5,4 +5,5 @@
    
 | #   | 날짜                                                                              | 카테고리     | 기록                                                    | 비고 |
 | :-- | :-------------------------------------------------------------------------------- | :----------- | :------------------------------------------------------ | :--- |
+| 2   | [20210922](https://minsangkimme.github.io/learn-interactive-dev/bounceBall/index.html)                                          | canvas  | 바운스 볼 효과                           |      |
 | 1   | [20210901](https://minsangkimme.github.io/learn-interactive-dev/polygon/index.html)                                          | canvas  | 다각형 도형 회전 시키기                           |      |
