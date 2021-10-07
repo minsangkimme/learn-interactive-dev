@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas draw Image</title>
+    <style>
+        .canvas {
+            background-color: #eee;
+        }
+        .button {
+            width: 50px;
+            height: 50px;
+            border: 0;
+            border-radius: 50%;            
+        }
+        .button[data-color="black"] {
+            background-color: black;            
+        }
+        .button[data-color="red"] {
+            background-color: red;            
+        }
+        .button[data-color="green"] {
+            background-color: green;            
+        }
+        .button[data-color="blue"] {
+            background-color: blue;          
+        }
+        .img-button {                        
+            background: url('./images/i13683537530.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div>Image</div>
+    <canvas class="canvas" width="600" height="400">이 브라우저는 캔버스를 지원하지 않습니다.</canvas>
+    <div class="button-wrap">
+        <button class="button" data-type="color" data-color="black"></button>
+        <button class="button" data-type="color" data-color="red"></button>
+        <button class="button" data-type="color" data-color="green"></button>
+        <button class="button" data-type="color" data-color="blue"></button>
+        <button class="button img-button" data-type="image"></button>
+        <button class="button" data-type="erase" data-color="white"></button>
+    </div>
+    <script>
+        const canvas = document.querySelector('.canvas');
+        const context = canvas.getContext('2d');
+        const buttonWrap = document.querySelector('.button-wrap');
+
+        const imgElem = new Image();
+        imgElem.src = './images/i13683537530.png';
+
+        let drawMode = false;
+        let brush = 'color';
+        let drawColor = 'black';
+
+        function radian(각도) {
+            return 각도 * Math.PI / 180;
+        }
+
+        function clickHandler(e) {            
+            brush = e.target.getAttribute('data-type');
+            drawColor = e.target.getAttribute('data-color');
+            context.fillStyle = drawColor;
+
+            if (brush === 'erase') {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function downHandler() {
+            drawMode = true;
+        }
+
+        function upHandler() {
+            drawMode = false;
+        }
+
+        function moveHandler ({layerX, layerY}) {
+            if (!drawMode) return;
+
+            switch (brush) {
+                case 'color': 
+                    context.beginPath();            
+                    context.arc(layerX, layerY, 5, 0, radian(360), false);
+                    context.fill();
+                    break;
+                case 'image':
+                    context.drawImage(imgElem, layerX, layerY, 40, 40);
+                    break;                
+            }               
+        }
+
+        function drawImage() {
+            // context.drawImage(imgElem, 50, 50); // x, y좌표에 그린다
+            context.drawImage(imgElem, 50, 50, 40, 40);   // x,y 좌표에 원하는 width, height 만큼 그린다.         
+            // context.drawImage(imgElem, 50, 50, 170, 170, 100, 100, 40, 40);  // 원본 이미지 x,y 에 width, height 만큼 잘라서 canvas x,y 좌표에 원하는 width, height 크기로 그린다.           
+        }
+
+        canvas.addEventListener('mousedown', downHandler);
+        canvas.addEventListener('mousemove', moveHandler);
+        canvas.addEventListener('mouseup', upHandler);
+        // imgElem.addEventListener('load', drawImage);
+        buttonWrap.addEventListener('click', clickHandler);
+    </script>
+</body>
+</html>
