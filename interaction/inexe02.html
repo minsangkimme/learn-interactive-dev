@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaction Canvas</title>
+    <style>        
+        .canvas {
+            background-color: #eee;
+        }
+        .select {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Interaction</h3>
+    <div>
+        <span>상자 생성 갯수</span>
+        <select class="select">
+            <option value="10" selected>10</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="1000">1000</option>
+            <option value="10000">10000</option>
+        </select>
+    </div>
+    <canvas class="canvas" width=600 height=400>이 브라우저는 캔버스를 지원하지 않습니다.</canvas>    
+    <script>
+        class Panel {
+            constructor() {                
+                
+            }
+
+            draw() {
+                context.fillStyle = '#fff000';
+                context.fillRect = (oX - 150, oY -150, 100, 100);
+            }
+        }
+    </script>
+    <script>
+        const canvas = document.querySelector('.canvas');
+        const selectElem = document.querySelector('.select');
+        const context = canvas.getContext('2d');
+        const boxes = [];        
+        let panel;
+        let selectedBox;
+        let createBoxCount = 10;        
+        const oX = window.innerWidth;
+        const oY = window.innerHeight;
+
+        class Box {
+            constructor(index, x, y, speed) {
+                this.x = x;
+                this.y = y;  
+                this.index = index;      
+                this.speed = speed;        
+                this.width = 100;
+                this.height = 100;
+                this.draw();
+            }
+
+            draw() {                                
+                context.fillStyle = `rgba(0,0,0,0.5)`;                
+                context.fillRect(this.x, this.y, this.width, this.height);
+                context.fillStyle = '#fff';                
+                context.fillText(this.index, this.x+5, this.y+10);
+            }
+        }
+
+        function render() {
+            let box;
+            context.clearRect(0, 0, canvas.width, canvas.height);            
+
+            for (let i = 0; i < boxes.length; i++) {
+                box = boxes[i];                
+                box.x += box.speed;
+                
+                if (box.x > canvas.width) {
+                    box.x = -box.width;
+                }
+
+               
+                box.draw();
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        function init() {
+            let tempX, tempY, tempSpeed;
+ 
+            // boxes 초기화
+            boxes.splice(0, boxes.length);
+
+            for (let i = 0; i < createBoxCount; i++) {
+                tempX = Math.random() * canvas.width * 0.8;
+                tempY = Math.random() * canvas.height * 0.8;
+                tempSpeed = Math.random() * 4 + 1;                
+                boxes.push(new Box(i, tempX, tempY, tempSpeed));
+            }
+
+            panel = new Panel();
+
+            render();
+        }
+       
+        function clickHandler(e) {        
+            const x = e.layerX;
+            const y = e.layerY;
+            let box;
+
+            for (let i = 0; i < boxes.length; i++)  {
+                box = boxes[i];
+
+                if (x > box.x &&
+                x < box.x + box.width &&
+                y > box.y &&
+                y < box.y + box.height) {
+                    selectedBox = box;                    
+                }
+            }
+
+            if (selectedBox) {
+                console.log(selectedBox.index);
+                selectedBox = null;
+            }    
+        }
+
+        function changeHandler(e) {
+            createBoxCount = e.target.value;
+            init();
+        }
+
+        canvas.addEventListener('click', clickHandler);
+        selectElem.addEventListener('change', changeHandler);
+
+        init();
+
+    </script>
+</body>
+</html>
