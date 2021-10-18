@@ -29,13 +29,23 @@
     <canvas class="canvas" width=600 height=400>이 브라우저는 캔버스를 지원하지 않습니다.</canvas>    
     <script>
         class Panel {
-            constructor() {                
-                
+            constructor() {                                
+                this.scale = 0;
             }
 
-            draw() {
-                context.fillStyle = '#fff000';
-                context.fillRect = (oX - 150, oY -150, 100, 100);
+            draw() {                
+                context.fillStyle = 'rgba(255, 0,0,0.8)';
+                context.resetTransform();
+                context.translate(oX, oY);
+                context.scale(this.scale, this.scale);
+                context.translate(-oX, -oY);
+                context.fillRect(oX-150, oY-150, 300, 300);
+                context.resetTransform();
+            }
+
+            showContent(content) {
+                context.fillStyle = '#fff';
+                context.fillText(content, oX, oY);                
             }
         }
     </script>
@@ -47,8 +57,9 @@
         let panel;
         let selectedBox;
         let createBoxCount = 10;        
-        const oX = window.innerWidth;
-        const oY = window.innerHeight;
+        let oX;
+        let oY;
+        let step = 1;
 
         class Box {
             constructor(index, x, y, speed) {
@@ -72,25 +83,44 @@
         function render() {
             let box;
             context.clearRect(0, 0, canvas.width, canvas.height);            
-
-            for (let i = 0; i < boxes.length; i++) {
-                box = boxes[i];                
-                box.x += box.speed;
-                
-                if (box.x > canvas.width) {
-                    box.x = -box.width;
-                }
-
-               
+            for (let i = 0; i < boxes.length; i++) {                
+                box = boxes[i];         
                 box.draw();
+            }
+
+            switch (step) {
+                case 1:
+                    for (let i = 0; i < boxes.length; i++) {
+                        box = boxes[i];         
+                        box.x += box.speed;
+                        if (box.x > canvas.width) {
+                            box.x = -box.width;
+                        }                   
+                    }   
+                                    
+                    break;
+
+                case 2:                    
+                    panel.scale = panel.scale + (1 - panel.scale)*0.1;
+                    panel.draw();
+
+                    if (panel.scale >= 0.99) {
+                        step = 3;
+                    }
+                    break;
+                case 3: 
+                    panel.draw();
+                    panel.showContent(selectedBox.index);
             }
 
             requestAnimationFrame(render);
         }
 
+        let tempX, tempY, tempSpeed ;
+
         function init() {
-            let tempX, tempY, tempSpeed;
- 
+            oX = canvas.width / 2;
+            oY = canvas.height / 2;
             // boxes 초기화
             boxes.splice(0, boxes.length);
 
@@ -122,10 +152,14 @@
                 }
             }
 
-            if (selectedBox) {
+            if (step === 1 && selectedBox) {
                 console.log(selectedBox.index);
+                step = 2;                
+            } else if (step === 3) {
+                step = 1;
+                panel.scale = 0;
                 selectedBox = null;
-            }    
+            }
         }
 
         function changeHandler(e) {
