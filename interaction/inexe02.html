@@ -31,6 +31,7 @@
         class Panel {
             constructor() {                                
                 this.scale = 0;
+                this.angle = 0;
             }
 
             draw() {                
@@ -38,6 +39,7 @@
                 context.resetTransform();
                 context.translate(oX, oY);
                 context.scale(this.scale, this.scale);
+                context.rotate(this.angle * Math.PI/180);
                 context.translate(-oX, -oY);
                 context.fillRect(oX-150, oY-150, 300, 300);
                 context.resetTransform();
@@ -101,10 +103,12 @@
                     break;
 
                 case 2:                    
-                    panel.scale = panel.scale + (1 - panel.scale)*0.1;
+                    panel.scale = panel.scale + (1 - panel.scale)*0.07;
+                    panel.angle = panel.scale * 720;
                     panel.draw();
 
-                    if (panel.scale >= 0.99) {
+                    if (panel.scale >= 0.999) {
+                        panel.scale = 1;
                         step = 3;
                     }
                     break;
