@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interaction Canvas</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #262626;
+        justify-content: center;
+        color: #fff;
+      }
+      .canvas {
+        background: no-repeat url("./sample.png") center center;
+        background-size: 600px 700px;
+      }
+      .select {
+        margin: 10px;
+      }
+      .point {
+        font-size: 32px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Interaction</h3>
+    <canvas class="canvas" width="600" height="700"
+      >이 브라우저는 캔버스를 지원하지 않습니다.</canvas
+    >
+    <div>
+      <label for="answer">
+        입력👾
+        <input type="text" name="" id="answer" />
+      </label>
+    </div>
+    <div class="point">0</div>
+    <script>
+      const canvas = document.querySelector(".canvas");
+      const pointElem = document.querySelector(".point");
+      const inputElem = document.querySelector("#answer");
+      const context = canvas.getContext("2d");
+      const keywords = [
+        "세탁특공대",
+        "세특",
+        "이벤트",
+        "테스트",
+        "와이셔츠",
+        "친구초대",
+        "무료쿠폰",
+        "2000원",
+        "3000원",
+        "10000원",
+      ];
+      let words = [];
+      let selectedBox;
+      let point = 0;
+      let createBoxCount = 10;
+
+      class Box {
+        constructor(index, x, y, speed, word) {
+          this.x = x;
+          this.y = y;
+          this.index = index;
+          this.speed = speed;
+          this.word = word;
+          this.draw();
+        }
+        draw() {
+          context.fillStyle = "#fff";
+          context.font = "18px Arial";
+          context.fillText(this.word, this.x + 5, this.y + 10);
+        }
+      }
+
+      function render() {
+        let box;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < words.length; i++) {
+          box = words[i];
+          box.y += box.speed;
+
+          if (box.y > canvas.height) {
+            // 이미지 지나간 경우 제거
+            words = words.filter((v) => v.word !== box.word);
+            box.y = -box.height;
+          }
+
+          box.draw();
+        }
+
+        requestAnimationFrame(render);
+      }
+
+      function renderBox() {
+        let tempX, tempY, tempSpeed, tempWidth, tempHeight;
+
+        // words 초기화
+        words.splice(0, words.length);
+
+        for (let i = 0; i < createBoxCount; i++) {
+          tempX = Math.random() * canvas.width * 0.8;
+          tempY = Math.random() * canvas.height * 0;
+          tempSpeed = Math.random() * 1.1;
+          word = keywords[i];
+          words.push(new Box(i, tempX, tempY, tempSpeed, word));
+        }
+      }
+
+      function changeHandler(e) {
+        createBoxCount = e.target.value;
+        renderBox();
+      }
+
+      function onChange(e) {
+        const { value } = e.target;
+        const checkResult = words.findIndex((v) => v.word === value);
+
+        if (checkResult > -1) {
+          words = words.filter((v, i) => i !== checkResult);
+          point += 1;
+          pointElem.textContent = point;
+          inputElem.value = "";
+        }
+      }
+      inputElem.addEventListener("input", onChange);
+      renderBox();
+      render();
+    </script>
+  </body>
+</html>
